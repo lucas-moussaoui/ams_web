@@ -17,7 +17,7 @@ https.createServer(options, app).listen(port, () => {
 })
 
 app.get('/', (request, response) => {
-    response.redirect('/login');
+    response.sendFile(path.join(__dirname + '/../front-end/index.html'))
 })
 
 app.get('/login', (request, response) => {
@@ -27,8 +27,6 @@ app.get('/login', (request, response) => {
 
     if(email && password){
         console.log(email, password);
-        response.redirect('/login');
-    } else{
-        response.sendFile(path.join(__dirname + '/../front-end/index.html'))
+        response.status(200).send("");
     }
 });
