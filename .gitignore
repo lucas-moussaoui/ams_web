@@ -1,0 +1,5 @@
+/back-end/node_modules/
+/back-end/cert.pem
+/back-end/key.pem
+/back-end/.idea/
+/.idea/
