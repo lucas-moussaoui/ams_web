@@ -1,7 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
 const path = require("path");
+const pgClient = require('pg');
+
+const connectionObj = new pgClient.Pool({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+})
 
 const app = express();
 
@@ -21,8 +31,33 @@ https.createServer(options, app).listen(port, () => {
 
 // cette route renvoie le fichier HTML du front-end
 app.get('/', (request, response) => {
-    response.sendFile(path.join(__dirname + '/../front-end/index.html'))
+    //response.sendFile(path.join(__dirname + '/../front-end/index.html'))
 })
+
+app.get('/test-db', (request, response) => {
+    connectionObj.connect((err, client, done) => {
+        if(err) {
+            console.log('Erreur de connexion : ' + err.stack);
+            return response.status(500).send("Erreur de connexion au serveur PG");
+        }
+
+        console.log('Connexion établie avec le serveur PG');
+
+        const sql = "SELECT * FROM fredouil.compte";
+
+        client.query(sql, (err, result) => {
+            done();
+
+            if (err) {
+                console.log(err.stack);
+                response.status(500).send("Erreur lors de l'exécution de la requête");
+            } else {
+                console.log(result.rows);
+                response.json(result.rows);
+            }
+        });
+    });
+});
 
 // Récupère le login de l'utilisateur et l'affiche dans la console
 app.get('/login', (request, response) => {
