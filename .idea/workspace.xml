@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2e3073a3-78f1-44da-812e-0577e46c64d9" name="Changes" comment="Etape 2 - Correctif">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
@@ -32,9 +31,6 @@
     &quot;accountId&quot;: &quot;abfeb9a7-3c24-405e-888d-20ab9eba0646&quot;
   }
 }</component>
-  <component name="PackageJsonUpdateNotifier">
-    <dismissed value="$PROJECT_DIR$/package.json" />
-  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
   </component>
@@ -63,6 +59,7 @@
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
+      "mongo",
       "postgresql"
     ]
   }
@@ -74,7 +71,7 @@
       <window_info id="Backup and Sync History" />
       <window_info id="Pull Requests" />
       <window_info id="Learn" show_stripe_button="false" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.33027345" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2861507" />
       <window_info id="Commit" order="1" weight="0.33027345" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" />
@@ -84,8 +81,8 @@
       <window_info anchor="bottom" id="File Transfer" />
       <window_info anchor="bottom" id="Version Control" order="0" weight="0.2970546" />
       <window_info anchor="bottom" id="Problems" order="1" />
-      <window_info active="true" anchor="bottom" id="Problems View" order="2" visible="true" weight="0.3301006" />
-      <window_info active="true" anchor="bottom" x="-2944" y="0" width="1472" height="920" id="Terminal" order="3" type="FLOATING" visible="true" weight="0.3301006" />
+      <window_info anchor="bottom" id="Problems View" order="2" weight="0.26288658" />
+      <window_info active="true" anchor="bottom" x="-151" y="349" width="1472" height="872" id="Terminal" order="3" visible="true" weight="0.26288658" />
       <window_info anchor="bottom" id="Services" order="4" />
       <window_info anchor="bottom" id="Find" order="5" weight="0.3301006" />
       <window_info anchor="bottom" id="Run" order="6" weight="0.3301006" />
@@ -94,7 +91,7 @@
       <window_info anchor="right" id="Coverage" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Notifications" order="0" weight="0.25" />
       <window_info anchor="right" id="AIAssistant" order="1" weight="0.25" />
-      <window_info anchor="right" id="Database" order="2" weight="0.3298828" />
+      <window_info anchor="right" id="Database" order="2" weight="0.32959944" />
       <window_info anchor="right" id="Gradle" order="3" weight="0.25" />
       <window_info anchor="right" id="Maven" order="4" weight="0.25" />
     </layout>
@@ -103,6 +100,19 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ams_web" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="ams_web" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -123,6 +133,8 @@
       <workItem from="1770798151559" duration="3970000" />
       <workItem from="1773179404480" duration="115000" />
       <workItem from="1773179535031" duration="5498000" />
+      <workItem from="1773220946651" duration="1482000" />
+      <workItem from="1773222473094" duration="421000" />
     </task>
     <task id="LOCAL-00001" summary="Etape 1">
       <option name="closed" value="true" />

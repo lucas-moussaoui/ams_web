@@ -4,6 +4,8 @@ const https = require('https');
 const fs = require('fs');
 const path = require("path");
 const pgClient = require('pg');
+const MongoClient = require('mongodb').MongoClient;
+const dsnMongoDB = "mongodb://localhost:27017/db-CERI";
 
 const connectionObj = new pgClient.Pool({
     user: process.env.DB_USER,
@@ -58,6 +60,26 @@ app.get('/test-db', (request, response) => {
         });
     });
 });
+app.get('/test-mongo', (request, response) => {
+    MongoClient.connect(dsnMongoDB)
+        .then(client => {
+            const db = client.db('db-CERI');
+
+            db.collection('CERISoNet').find({}).toArray()
+                .then(posts => {
+                    console.log("Documents trouvés :", posts.length);
+                    if (posts.length > 0) {
+                        response.json(posts);
+                    }
+                    client.close();
+                })
+                .catch(err => {
+                    console.log("Erreur find :", err);
+                    response.status(500).send("Erreur de lecture");
+                });
+        })
+});
+
 
 // Récupère le login de l'utilisateur et l'affiche dans la console
 app.get('/login', (request, response) => {
