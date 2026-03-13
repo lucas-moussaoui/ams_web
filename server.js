@@ -2,11 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const https = require('https');
 const fs = require('fs');
-const path = require("path");
 const pgClient = require('pg');
-const MongoClient = require('mongodb').MongoClient;
-const dsnMongoDB = "mongodb://localhost:27017/db-CERI";
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+const cors = require('cors');
 
+// Configuration de la connexion à PostgreSQL
 const connectionObj = new pgClient.Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -16,79 +17,92 @@ const connectionObj = new pgClient.Pool({
 })
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Lecture des certificats SSL pour le HTTPS
-// 'key.pem' est la clé privée, 'cert.pem' est le certificat public
+const port = 3115;
+
+// Autorise mon front-end Angular (port 3114) à parler à ce serveur
+app.use(cors({
+    origin: 'https://pedago.univ-avignon.fr:3114',
+    credentials: true
+}));
+
+// Gestion des sessions : on stocke qui est connecté dans MongoDB
+app.use(session({
+    secret: 'signature-sympa',
+    saveUninitialized: false,
+    resave: false,
+    store: new MongoDBStore({
+        uri: "mongodb://localhost:27017/db-CERI",
+        collection: "MySession3115",
+        touchAfter: 24 * 3600
+    }),
+    cookie: {
+        maxAge: 24 * 3600 * 1000, // La session dure 24h
+        secure: true, // Obligatoire car on est en HTTPS
+        sameSite: 'none',
+    }
+}));
+
+// Route pour vérifier les identifiants
+app.post('/login', (request, response) => {
+    const email = request.body.mail;
+    const password = request.body.password;
+
+    if (email && password) {
+        connectionObj.connect((err, client, done) => {
+            if (err) return response.status(500).send("Erreur connexion PG");
+
+            // Requête SQL pour vérifier si l'utilisateur existe
+            const sql = "SELECT id, pseudo, mail FROM fredouil.compte WHERE mail = $1 AND motpasse = $2";
+            const values = [email, password];
+
+            client.query(sql, values, (err, result) => {
+                done(); // Libère la connexion
+
+                if (result.rows.length > 0) {
+                    const user = result.rows[0];
+                    // On enregistre l'utilisateur dans la session
+                    request.session.isConnected = true;
+                    request.session.user = { id: user.id, pseudo: user.pseudo, mail: user.mail };
+
+                    response.json({ success: true, user: user.pseudo });
+                } else {
+                    response.status(401).json({ success: false, message: "Identifiants incorrects" });
+                }
+            });
+        });
+    }
+});
+
+// Route pour déconnecter : on vide la session et on efface le cookie
+app.post('/logout', (req, res) => {
+    req.session.destroy();
+    res.clearCookie('connect.sid', {
+        path: '/',
+        domain: 'pedago.univ-avignon.fr',
+        secure: true,
+        sameSite: 'none'
+    });
+    res.json({ success: true });
+});
+
+// Route pour savoir si l'utilisateur est toujours connecté au rafraîchissement de la page
+app.get('/check-session', (req, res) => {
+    if (req.session && req.session.user) {
+        res.json({ authenticated: true, user: req.session.user.pseudo });
+    } else {
+        res.status(401).json({ authenticated: false });
+    }
+});
+
+// Lancement du serveur en HTTPS avec les certificats SSL
 const options = {
     key: fs.readFileSync('key.pem'),
     cert: fs.readFileSync('cert.pem')
 };
 
-const port = 3115;
-
-// Création du serveur HTTPS
 https.createServer(options, app).listen(port, () => {
-    console.log("écoute sur le port : " + port);
+    console.log("Serveur Node sécurisé lancé sur le port : " + port);
 })
-
-// cette route renvoie le fichier HTML du front-end
-app.get('/', (request, response) => {
-    //response.sendFile(path.join(__dirname + '/../front-end/index.html'))
-})
-
-app.get('/test-db', (request, response) => {
-    connectionObj.connect((err, client, done) => {
-        if(err) {
-            console.log('Erreur de connexion : ' + err.stack);
-            return response.status(500).send("Erreur de connexion au serveur PG");
-        }
-
-        console.log('Connexion établie avec le serveur PG');
-
-        const sql = "SELECT * FROM fredouil.compte";
-
-        client.query(sql, (err, result) => {
-            done();
-
-            if (err) {
-                console.log(err.stack);
-                response.status(500).send("Erreur lors de l'exécution de la requête");
-            } else {
-                console.log(result.rows);
-                response.json(result.rows);
-            }
-        });
-    });
-});
-app.get('/test-mongo', (request, response) => {
-    MongoClient.connect(dsnMongoDB)
-        .then(client => {
-            const db = client.db('db-CERI');
-
-            db.collection('CERISoNet').find({}).toArray()
-                .then(posts => {
-                    console.log("Documents trouvés :", posts.length);
-                    if (posts.length > 0) {
-                        response.json(posts);
-                    }
-                    client.close();
-                })
-                .catch(err => {
-                    console.log("Erreur find :", err);
-                    response.status(500).send("Erreur de lecture");
-                });
-        })
-});
-
-
-// Récupère le login de l'utilisateur et l'affiche dans la console
-app.get('/login', (request, response) => {
-
-    var email = request.query.email;
-    var password = request.query.password;
-
-    if(email && password){
-        console.log(email, password);
-        response.status(200).send("");
-    }
-});

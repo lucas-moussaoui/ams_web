@@ -1,0 +1,31 @@
+<div class="flex items-center justify-between bg-amber-700 p-4 rounded-b-xl text-white shadow-md">
+
+  <h1 class="text-xl font-bold">
+    CERI<span class="opacity-70">SoNet</span>
+  </h1>
+
+  <div class="flex items-center gap-4">
+
+    @if(authService.isLoggedIn()){
+      <div class="flex flex-col items-end">
+        <span class="font-medium">Bonjour {{ authService.currentUser() }}</span>
+
+        @if(authService.getDerniereConnexion()) {
+          <span class="text-xs opacity-80">
+            Dernière connexion : {{ authService.getDerniereConnexion() }}
+          </span>
+        }
+      </div>
+
+      <button (click)="authService.deconnexion()" class="bg-white text-amber-700 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-amber-50">
+        Quitter
+      </button>
+    } @else {
+      <button
+        (click)="authService.openLoginDialog()"
+        class="bg-white text-amber-700 px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-amber-50">
+        Se connecter
+      </button>
+    }
+  </div>
+</div>

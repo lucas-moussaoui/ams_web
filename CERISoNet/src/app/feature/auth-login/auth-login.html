@@ -1,0 +1,28 @@
+<div class="p-6 bg-white rounded border shadow-lg max-w-sm">
+  <h2 class="text-xl font-bold mb-4">Connexion</h2>
+
+  @if (errorMessage) {
+    <p class="text-red-500 border p-4 rounded text-sm mb-2">{{ errorMessage }}</p>
+  }
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <input
+      type="email"
+      formControlName="mail"
+      placeholder="Email"
+      class="border p-2 rounded">
+
+    <input
+      type="password"
+      formControlName="password"
+      placeholder="Mot de passe"
+      class="border p-2 rounded">
+
+    <button
+      type="submit"
+      [disabled]="loginForm.invalid"
+      class="bg-amber-700 text-white p-2 rounded disabled:bg-gray-300">
+      Valider
+    </button>
+  </form>
+</div>
