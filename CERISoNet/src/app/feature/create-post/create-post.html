@@ -1,0 +1,43 @@
+<div class="p-6 bg-white rounded-md max-w-md">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Nouveau post</h2>
+
+  <form [formGroup]="postForm" (ngSubmit)="onPublier()" class="flex flex-col gap-4">
+
+    <textarea
+      formControlName="body"
+      placeholder="Quoi de neuf au CERI ?"
+      rows="4"
+      class="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-amber-700 focus:outline-none resize-none">
+    </textarea>
+
+    <div class="flex gap-3">
+      <input
+        type="text"
+        formControlName="imageUrl"
+        placeholder="URL de l'image"
+        class="flex-1 border border-gray-300 p-2 rounded-md text-sm focus:outline-none focus:border-amber-700">
+
+      <input
+        type="text"
+        formControlName="imageTitle"
+        placeholder="Titre"
+        class="w-1/3 border border-gray-300 p-2 rounded-md text-sm focus:outline-none focus:border-amber-700">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <button
+        type="button"
+        (click)="dialogRef.close()"
+        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+        Annuler
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="postForm.invalid"
+        class="bg-amber-700 text-white px-6 py-2 rounded-md font-medium disabled:bg-gray-300 disabled:cursor-not-allowed transition">
+        Publier
+      </button>
+    </div>
+  </form>
+</div>

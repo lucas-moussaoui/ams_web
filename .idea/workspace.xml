@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2e3073a3-78f1-44da-812e-0577e46c64d9" name="Changes" comment="Etape 2 - Fin">
-      <change afterPath="$PROJECT_DIR$/CERISoNet/src/app/service/posts.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/feature/auth-login/auth-login.ts" beforeDir="false" afterPath="$PROJECT_DIR$/CERISoNet/src/app/feature/auth-login/auth-login.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/feature/header/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/CERISoNet/src/app/feature/header/header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/feature/home/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/CERISoNet/src/app/feature/home/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/feature/home/home.spec.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/feature/home/home.ts" beforeDir="false" afterPath="$PROJECT_DIR$/CERISoNet/src/app/feature/home/home.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CERISoNet/src/app/service/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/CERISoNet/src/app/service/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
-    </list>
+    <list default="true" id="2e3073a3-78f1-44da-812e-0577e46c64d9" name="Changes" comment="Etape 3 - Fin" />
     <list id="a36c0fb2-e92f-477c-9585-a6468aa57949" name="Never push" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,11 +62,11 @@
       <window_info id="Merge Requests" />
       <window_info id="Backup and Sync History" />
       <window_info id="Learn" show_stripe_button="false" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.50091994" visible="true" weight="0.16230468" />
-      <window_info id="Commit" order="1" weight="0.16230468" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.50091994" weight="0.16230468" />
+      <window_info active="true" id="Commit" order="1" visible="true" weight="0.16230468" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.2861328" />
       <window_info id="Pull Requests" order="3" weight="0.2861328" />
-      <window_info active="true" id="Bookmarks" order="4" sideWeight="0.49908006" side_tool="true" visible="true" weight="0.16230468" />
+      <window_info active="true" id="Bookmarks" order="4" side_tool="true" visible="true" weight="0.16230468" />
       <window_info anchor="bottom" id="Database Changes" />
       <window_info anchor="bottom" id="TypeScript" />
       <window_info anchor="bottom" id="Profiler" />
@@ -137,7 +127,7 @@
       <workItem from="1775074837981" duration="370000" />
       <workItem from="1775138831150" duration="989000" />
       <workItem from="1775214542602" duration="94000" />
-      <workItem from="1775214682548" duration="14985000" />
+      <workItem from="1775214682548" duration="15344000" />
     </task>
     <task id="LOCAL-00001" summary="Etape 1">
       <option name="closed" value="true" />
@@ -195,7 +185,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773440557397</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Etape 3 - Fin">
+      <option name="closed" value="true" />
+      <created>1775231113296</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1775231113296</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -219,7 +217,8 @@
     <MESSAGE value="Etape 2 - Correctif" />
     <MESSAGE value="Etape 2 - Test connexion MongoDb" />
     <MESSAGE value="Etape 2 - Fin" />
-    <option name="LAST_COMMIT_MESSAGE" value="Etape 2 - Fin" />
+    <MESSAGE value="Etape 3 - Fin" />
+    <option name="LAST_COMMIT_MESSAGE" value="Etape 3 - Fin" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
