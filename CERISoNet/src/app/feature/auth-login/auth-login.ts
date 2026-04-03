@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../service/auth.service';
 import { BandeauInfoService } from '../../service/bandeau-info.service';
+import { PostsService } from '../../service/posts.service';
 
 @Component({
   selector: 'app-auth-login',
@@ -19,6 +20,7 @@ export class AuthLogin {
   private dialogRef = inject(MatDialogRef<AuthLogin>);
   private authService = inject(AuthService);
   private bandeauInfoService = inject(BandeauInfoService);
+  private postsService = inject(PostsService);
 
   API_URL = 'https://pedago.univ-avignon.fr:3115';
   errorMessage: string | null = null; // Stocke l'erreur pour l'affichage HTML
@@ -50,6 +52,7 @@ export class AuthLogin {
               localStorage.setItem('heureConnexion', maintenant.toLocaleTimeString());
 
               this.bandeauInfoService.notifier(`Connexion réussie !`, 'success');
+              this.postsService.initialiserPosts(); // Permer d'initialiser es posts lors de la connexion
               this.dialogRef.close(true); // Fermeture de la modale
             }
           },

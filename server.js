@@ -6,6 +6,9 @@ const pgClient = require('pg');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const cors = require('cors');
+const MongoClient = require('mongodb').MongoClient;
+const mongoUrl = "mongodb://localhost:27017";
+const clientMongo = new MongoClient(mongoUrl);
 
 // Configuration de la connexion à PostgreSQL
 const connectionObj = new pgClient.Pool({
@@ -94,6 +97,69 @@ app.get('/check-session', (req, res) => {
         res.json({ authenticated: true, user: req.session.user.pseudo });
     } else {
         res.status(401).json({ authenticated: false });
+    }
+});
+
+app.get('/posts', async (req, res) => {
+    // Récupération des posts depuis la base de données
+    if (!req.session.user) {
+        return res.status(401).send("Accès refusé");
+    }
+
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = parseInt(req.query.skip) || 0;
+
+    try {
+        const database = clientMongo.db('db-CERI');
+        const collection = database.collection('CERISoNet');
+
+        const posts = await collection.find()
+            .sort({ _id: -1 }) // On trie via l'id ( car l'id contient la date de création dans ses 4 premier octet )
+            .skip(skip)
+            .limit(limit)
+            .toArray(); // renvoi la liste des postes
+
+        res.json(posts);
+    } catch (err) {
+        res.status(500).send("Erreur lors de la récupération des posts");
+    }
+});
+
+app.post('/create-post', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Vous devez être connecté" });
+    }
+
+    try {
+        const db = clientMongo.db('db-CERI');
+        const collection = db.collection('CERISoNet');
+
+        const maintenant = new Date();
+
+        // Construction du nouveau post
+        const nouveauPost = {
+            date: maintenant.toLocaleDateString('sv-SE'), // YYYY-MM-DD
+            hour: maintenant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), // 14:30
+            body: req.body.body,
+            createdBy: req.session.user.id,
+            images: req.body.image ? {
+                url: req.body.image.url || "",
+                title: req.body.image.title || ""
+            } : null,
+            likes: 0,
+            hashtags: req.body.hashtags || [],
+            comments: [],
+            shared: null
+        };
+
+        const result = await collection.insertOne(nouveauPost); // Insertion dans mongo DB via insertOne
+
+        if (result.acknowledged) { // Si mongo répond positivement
+            res.json({ success: true, message: "Post publié !", postId: result.insertedId }); // on envoi aussi l'id créer par mongo ( a des fin de debug )
+        }
+    } catch (err) {
+        console.error("Erreur création post:", err);
+        res.status(500).json({ message: "Erreur lors de la publication" });
     }
 });
 

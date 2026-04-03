@@ -1,13 +1,84 @@
-<div class="p-6 bg-gray-50 min-h-screen">
-  <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6">
+<div class="max-w-2xl mx-auto p-4 flex flex-col gap-6">
 
-    @for (item of [1,2,3,4,5,6,7,8,9,10,11,12]; track $index) {
-      <div class="h-48 bg-white shadow-xl rounded-xl border border-gray-200 flex items-center justify-center p-6 hover:scale-105 transition-transform">
-        <p class="text-gray-600 font-semibold text-center uppercase tracking-widest">
-          Post CERISoNet
-        </p>
+  @for (post of postsService.posts(); track post._id) {
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold">
+          {{ post.createdBy.toString() }}
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-sm">Utilisateur #{{ post.createdBy }}</h3>
+          <p class="text-xs text-gray-500">{{ post.date }} à {{ post.hour }}</p>
+        </div>
       </div>
-    }
 
-  </div>
+      @if (post.images?.url || post.image?.url) {
+        <div class="w-full bg-gray-100">
+          <img [src]="post.images?.url || post.image?.url"
+               [alt]="post.images?.title || post.image?.title"
+               class="w-full h-auto max-h-[500px] object-contain mx-auto">
+        </div>
+      }
+
+      <div class="p-4">
+        <p class="text-gray-800">{{ post.body }}</p>
+
+        @if (post.hashtags && post.hashtags.length > 0) {
+          <div class="flex flex-wrap gap-2 mt-3">
+            @for (tag of post.hashtags; track tag) {
+              <span class="text-amber-700 font-medium text-sm">
+                {{ tag }}
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="px-4 py-2 border-t border-gray-50 flex items-center gap-4">
+        <button>
+          <mat-icon>favorite_border</mat-icon>
+          <span class="text-sm font-medium">{{ post.likes || 0 }}</span>
+        </button>
+        <button class="flex items-center gap-1.5 text-gray-600 px-2 py-1 rounded-md">
+          <mat-icon>share</mat-icon>
+          <span class="text-sm font-medium">Partager</span>
+        </button>
+      </div>
+
+      @if (post.comments && post.comments.length > 0) {
+        <div class="bg-gray-50 p-4 border-t border-gray-100">
+          <p class="text-xs font-semibold text-gray-500 mb-3">
+            {{ post.comments.length }} commentaire(s)
+          </p>
+          <div class="flex flex-col gap-3">
+            @for (comment of post.comments; track $index) {
+              <div class="text-sm">
+                <span class="font-bold text-gray-800">Utilisateur #{{ comment.commentedBy }}</span>
+                <span class="text-gray-700 ml-2">{{ comment.text }}</span>
+                <div class="text-gray-400 mt-0.5">{{ comment.date }} à {{ comment.hour }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @empty {
+    <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+      <mat-icon class="text-6xl h-auto w-auto mb-4 text-gray-200">post_add</mat-icon>
+      <p class="text-lg font-medium">Aucun message à afficher pour le moment.</p>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="flex justify-center items-center py-8 gap-3 text-amber-700">
+      <mat-icon class="animate-spin">sync</mat-icon>
+      <span class="font-medium italic">Chargement du CERISoNet...</span>
+    </div>
+  }
 </div>
+
+<button (click)="openCreateDialog()"
+        class="fixed bottom-8 right-8 w-14 h-14 bg-amber-700 text-white rounded-full shadow-lg flex items-center justify-center z-50">
+  <mat-icon>add</mat-icon>
+</button>

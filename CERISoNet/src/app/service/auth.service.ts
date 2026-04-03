@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthLogin } from '../feature/auth-login/auth-login';
 import { HttpClient } from '@angular/common/http';
+import { PostsService } from './posts.service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 export class AuthService {
   private diaolg = inject(MatDialog);
   private http = inject(HttpClient);
+  private postsService = inject(PostsService)
 
   API_URL = 'https://pedago.univ-avignon.fr:3115';
 
@@ -32,10 +34,11 @@ export class AuthService {
       next: (res) => {
         console.log('Déconnexion réussie côté serveur');
 
-        // On remet tout à zéro proprement (signaux + stockage local)
+        // On remet tout à zéro proprement (signaux + stockage local + posts)
         this.isLoggedIn.set(false);
         this.currentUser.set(null);
         localStorage.clear();
+        this.postsService.viderPosts();
       },
       error: (err) => {
         console.error('Erreur lors du logout', err);
