@@ -56,6 +56,7 @@ export class AuthService {
         // Si le serveur répond OK, on reconnecte l'utilisateur
         this.isLoggedIn.set(true);
         this.currentUser.set(res.user);
+        this.postsService.initialiserPosts();
       },
       error: () => {
         // Sinon, on s'assure que tout est vide

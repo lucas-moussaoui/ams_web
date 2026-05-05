@@ -7,6 +7,7 @@ import { PostsService } from '../../service/posts.service';
 import { MatDialog } from '@angular/material/dialog';
 import { CreatePost } from '../create-post/create-post';
 import { BandeauInfoService } from '../../service/bandeau-info.service';
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -18,11 +19,14 @@ export class Home implements OnInit {
   private dialog = inject(MatDialog);
   protected postsService = inject(PostsService);
   private bandeauInfoService = inject(BandeauInfoService);
+  private authService = inject(AuthService);
 
   protected loading = false;
 
   ngOnInit() {
-    this.chargerPosts();
+    if (this.authService.isLoggedIn()) {
+      this.chargerPosts();
+    }
   }
 
   @HostListener('window:scroll', [])

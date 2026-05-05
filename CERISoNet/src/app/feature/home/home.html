@@ -26,7 +26,7 @@
 
         @if (post.hashtags && post.hashtags.length > 0) {
           <div class="flex flex-wrap gap-2 mt-3">
-            @for (tag of post.hashtags; track tag) {
+            @for (tag of post.hashtags; track $index) {
               <span class="text-amber-700 font-medium text-sm">
                 {{ tag }}
               </span>

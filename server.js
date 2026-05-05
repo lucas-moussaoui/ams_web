@@ -58,20 +58,24 @@ app.post('/login', (request, response) => {
         // on hache le password du body car les mdp de la bdd sont haché en sha1
         const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
 
-        connectionObj.connect((err, client, done) => {
+        connectionObj.connect((err, client) => {
             if (err) return response.status(500).send("Erreur connexion PG");
 
             // Requête SQL pour vérifier si l'utilisateur existe
             const sql = "SELECT id, pseudo, mail FROM fredouil.compte WHERE mail = $1 AND motpasse = $2";
             client.query(sql, [email, hashedPassword], (err, result) => {
-                done();
                 if (result.rows.length > 0) {
                     const user = result.rows[0];
+                    // On met le statut a 1
+                    client.query("UPDATE fredouil.compte SET statut_connexion = 1 WHERE id = $1", [user.id]);
+
                     // On enregistre l'utilisateur dans la session
                     request.session.isConnected = true;
                     request.session.user = { id: user.id, pseudo: user.pseudo, mail: user.mail };
+                    client.release();
                     response.json({ success: true, user: user.pseudo });
                 } else {
+                    client.release();
                     response.status(401).json({ success: false, message: "Identifiants incorrects" });
                 }
             });
@@ -81,6 +85,15 @@ app.post('/login', (request, response) => {
 
 // Route pour déconnecter : on vide la session et on efface le cookie
 app.post('/logout', (req, res) => {
+    if (req.session.user) {
+        connectionObj.connect((err, client) => {
+            if (!err) {
+                client.query("UPDATE fredouil.compte SET statut_connexion = 0 WHERE id = $1", [req.session.user.id], () => {
+                    client.release();
+                });
+            }
+        });
+    }
     req.session.destroy();
     res.clearCookie('connect.sid', {
         path: '/',
