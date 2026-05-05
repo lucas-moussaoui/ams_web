@@ -85,15 +85,8 @@ app.post('/login', (request, response) => {
 
 // Route pour déconnecter : on vide la session et on efface le cookie
 app.post('/logout', (req, res) => {
-    if (req.session.user) {
-        connectionObj.connect((err, client) => {
-            if (!err) {
-                client.query("UPDATE fredouil.compte SET statut_connexion = 0 WHERE id = $1", [req.session.user.id], () => {
-                    client.release();
-                });
-            }
-        });
-    }
+    const userId = req.session.user?.id;
+
     req.session.destroy();
     res.clearCookie('connect.sid', {
         path: '/',
@@ -101,6 +94,17 @@ app.post('/logout', (req, res) => {
         secure: true,
         sameSite: 'none'
     });
+
+    if (userId) {
+        connectionObj.connect((err, client) => {
+            if (!err) {
+                client.query("UPDATE fredouil.compte SET statut_connexion = 0 WHERE id = $1", [userId], () => {
+                    client.release();
+                });
+            }
+        });
+    }
+
     res.json({ success: true });
 });
 
