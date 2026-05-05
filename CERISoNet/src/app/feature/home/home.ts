@@ -76,4 +76,18 @@ export class Home implements OnInit {
       }
     });
   }
+
+  commenter(postId: string, texte: string) {
+    if (!texte.trim()) return;
+
+    this.postsService.commenter(postId, texte).subscribe({
+      next: (res) => {
+        this.postsService.ajouterCommentaireLocalement(postId, res.comment);
+        this.bandeauInfoService.notifier('Commentaire posté !', 'success');
+      },
+      error: () => {
+        this.bandeauInfoService.notifier('Erreur lors du commentaire', 'error');
+      },
+    });
+  }
 }

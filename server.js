@@ -176,6 +176,37 @@ app.post('/create-post', async (req, res) => {
     }
 });
 
+app.post('/comment', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Vous devez être connecté" });
+    }
+
+    try {
+        const db = clientMongo.db('db-CERI');
+        const collection = db.collection('CERISoNet');
+        const { ObjectId } = require('mongodb');
+
+        const maintenant = new Date();
+
+        const commentaire = {
+            text: req.body.text,
+            commentedBy: req.session.user.id,
+            date: maintenant.toLocaleDateString('sv-SE'),
+            hour: maintenant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        await collection.updateOne(
+            { _id: new ObjectId(req.body.postId) },
+            { $push: { comments: commentaire } }
+        );
+
+        res.json({ success: true, comment: commentaire });
+    } catch (err) {
+        console.error("Erreur commentaire:", err);
+        res.status(500).json({ message: "Erreur lors du commentaire" });
+    }
+});
+
 // Lancement du serveur en HTTPS avec les certificats SSL
 const options = {
     key: fs.readFileSync('key.pem'),

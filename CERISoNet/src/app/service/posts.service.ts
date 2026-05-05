@@ -56,4 +56,20 @@ export class PostsService {
       error: (err) => console.error('Erreur initialisation', err),
     });
   }
+
+  commenter(postId: string, texte: string) {
+    return this.http.post<any>(
+      `${this.API_URL}/comment`,
+      { postId, text: texte },
+      { withCredentials: true },
+    );
+  }
+
+  ajouterCommentaireLocalement(postId: string, commentaire: any) {
+    this.posts.update((posts) =>
+      posts.map((p) =>
+        p._id === postId ? { ...p, comments: [...(p.comments || []), commentaire] } : p,
+      ),
+    );
+  }
 }
