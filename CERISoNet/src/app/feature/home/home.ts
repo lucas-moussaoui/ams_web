@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -89,5 +89,17 @@ export class Home implements OnInit {
         this.bandeauInfoService.notifier('Erreur lors du commentaire', 'error');
       },
     });
+  }
+
+  trierPosts(tri: string) {
+    this.postsService.triActif.set(tri);
+    this.postsService.viderPosts();
+    this.chargerPosts();
+  }
+
+  changerOrdre() {
+    this.postsService.ordreActif.update((ordre) => (ordre === -1 ? 1 : -1));
+    this.postsService.viderPosts();
+    this.chargerPosts();
   }
 }

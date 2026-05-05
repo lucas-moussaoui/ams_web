@@ -13,10 +13,14 @@ export class PostsService {
   public skip = 0; // Permet de ne charger que les nouveaux posts en skkippant les ancien
   public limit = 10; // Limite de nouveau posts a charger a chaque requète
 
+  public triActif = signal<string>('date');
+  public ordreActif = signal<number>(-1); // -1 = décroissant, 1 = croissant
+
   getPosts(skip: number, limit: number) {
-    return this.http.get<any[]>(`${this.API_URL}/posts?skip=${skip}&limit=${limit}`, {
-      withCredentials: true,
-    });
+    return this.http.get<any[]>(
+      `${this.API_URL}/posts?skip=${skip}&limit=${limit}&tri=${this.triActif()}&ordre=${this.ordreActif()}`,
+      { withCredentials: true },
+    );
   }
 
   publier(message: string, urlImage: string, titreImage: string) {

@@ -125,17 +125,21 @@ app.get('/posts', async (req, res) => {
 
     const limit = parseInt(req.query.limit) || 10;
     const skip = parseInt(req.query.skip) || 0;
+    const tri = req.query.tri || 'date';
+    const ordre = parseInt(req.query.ordre) || -1; // -1 décroissant, 1 croissant
+
+    let sortOption = { _id: ordre };
+    if (tri === 'proprietaire') sortOption = { createdBy: ordre };
+    if (tri === 'popularite') sortOption = { likes: ordre };
 
     try {
         const database = clientMongo.db('db-CERI');
         const collection = database.collection('CERISoNet');
-
         const posts = await collection.find()
-            .sort({ _id: -1 }) // On trie via l'id ( car l'id contient la date de création dans ses 4 premier octet )
+            .sort(sortOption)
             .skip(skip)
             .limit(limit)
             .toArray(); // renvoi la liste des postes
-
         res.json(posts);
     } catch (err) {
         res.status(500).send("Erreur lors de la récupération des posts");
