@@ -9,6 +9,7 @@ const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = "mongodb://localhost:27017";
 const clientMongo = new MongoClient(mongoUrl);
+const crypto = require('crypto');
 
 // Configuration de la connexion à PostgreSQL
 const connectionObj = new pgClient.Pool({
@@ -54,22 +55,21 @@ app.post('/login', (request, response) => {
     const password = request.body.password;
 
     if (email && password) {
+        // on hache le password du body car les mdp de la bdd sont haché en sha1
+        const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
+
         connectionObj.connect((err, client, done) => {
             if (err) return response.status(500).send("Erreur connexion PG");
 
             // Requête SQL pour vérifier si l'utilisateur existe
             const sql = "SELECT id, pseudo, mail FROM fredouil.compte WHERE mail = $1 AND motpasse = $2";
-            const values = [email, password];
-
-            client.query(sql, values, (err, result) => {
-                done(); // Libère la connexion
-
+            client.query(sql, [email, hashedPassword], (err, result) => {
+                done();
                 if (result.rows.length > 0) {
                     const user = result.rows[0];
                     // On enregistre l'utilisateur dans la session
                     request.session.isConnected = true;
                     request.session.user = { id: user.id, pseudo: user.pseudo, mail: user.mail };
-
                     response.json({ success: true, user: user.pseudo });
                 } else {
                     response.status(401).json({ success: false, message: "Identifiants incorrects" });
