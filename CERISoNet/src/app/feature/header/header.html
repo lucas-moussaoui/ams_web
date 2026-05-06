@@ -1,4 +1,4 @@
-<div class="flex items-center justify-between bg-amber-700 p-4 rounded-b-xl text-white shadow-md">
+<div class="flex items-center justify-between bg-amber-700 p-4 rounded-b-xl text-white shadow-md relative">
 
   <h1 class="text-xl font-bold">
     CERI<span class="opacity-70">SoNet</span>
@@ -22,6 +22,24 @@
         <span class="text-[10px] md:text-xs opacity-80 italic">
           Dernière connexion : {{ authService.getDerniereConnexion() }}
         </span>
+      }
+
+      <button (click)="togglePopup()"
+              class="flex items-center gap-1 text-xs opacity-80 hover:opacity-100">
+        <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+        <span>{{ connectes().length }} connecté(s)</span>
+      </button>
+
+      @if(afficherPopup()) {
+        <div class="absolute top-full right-4 mt-2 bg-white text-gray-800 rounded-xl shadow-lg p-4 z-50 min-w-[200px]">
+          <p class="text-xs font-semibold text-gray-400 uppercase mb-3">Connectés</p>
+          @for(pseudo of connectes(); track pseudo) {
+            <div class="flex items-center gap-2 py-1 text-sm">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              {{ pseudo }}
+            </div>
+          }
+        </div>
       }
 
     } @else {

@@ -54,6 +54,7 @@ export class AuthLogin {
 
               this.bandeauInfoService.notifier(`Connexion réussie !`, 'success');
               this.postsService.initialiserPosts(); // Permer d'initialiser es posts lors de la connexion
+              this.authService.identifierAuWebSocket();
               this.dialogRef.close(true); // Fermeture de la modale
             }
           },

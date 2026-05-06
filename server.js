@@ -10,6 +10,7 @@ const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = "mongodb://localhost:27017";
 const clientMongo = new MongoClient(mongoUrl);
 const crypto = require('crypto');
+const utilisateursConnectes = new Map();
 
 // Configuration de la connexion à PostgreSQL
 const connectionObj = new pgClient.Pool({
@@ -242,6 +243,14 @@ const io = require('socket.io')(server, {
 io.on('connection', (socket) => {
     console.log('Un client WebSocket connecté');
 
+    socket.on('identification', (data) => {
+        utilisateursConnectes.set(data.userId, { pseudo: data.pseudo, socketId: socket.id });
+        // On broadcast la nouvelle liste à tout le monde
+        io.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
+        // Notif pour tout le monde
+        io.emit('connexionNotif', { pseudo: data.pseudo, type: 'connexion' });
+    });
+
     // Réception d'un like depuis un client
     socket.on('like', async (data) => {
         const { ObjectId } = require('mongodb');
@@ -268,6 +277,12 @@ io.on('connection', (socket) => {
                 console.error("Les likes sont encore corrompu super !", err.message);
             }
         }
+    });
+
+    socket.on('deconnexion', (data) => {
+        utilisateursConnectes.delete(data.userId);
+        io.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
+        io.emit('connexionNotif', { pseudo: data.pseudo, type: 'deconnexion' });
     });
 
     socket.on('disconnect', () => {

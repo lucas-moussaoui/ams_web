@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthLogin } from '../feature/auth-login/auth-login';
 import { HttpClient } from '@angular/common/http';
 import { PostsService } from './posts.service';
+import { WebSocketService } from './websocket.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ export class AuthService {
   private diaolg = inject(MatDialog);
   private http = inject(HttpClient);
   private postsService = inject(PostsService);
+  private webSocketService = inject(WebSocketService);
 
   API_URL = 'https://pedago.univ-avignon.fr:3115';
 
@@ -30,6 +32,12 @@ export class AuthService {
 
   // Gère la sortie de l'utilisateur
   public deconnexion() {
+
+    this.webSocketService.emit('deconnexion', {
+      userId: this.currentUserId(),
+      pseudo: this.currentUser(),
+    });
+
     // On prévient le serveur qu'on part
     this.http.post<any>(`${this.API_URL}/logout`, {}, { withCredentials: true }).subscribe({
       next: (res) => {
@@ -59,6 +67,7 @@ export class AuthService {
         this.currentUser.set(res.user);
         this.currentUserId.set(parseInt(res.id));
         this.postsService.initialiserPosts();
+        this.identifierAuWebSocket();
       },
       error: () => {
         // Sinon, on s'assure que tout est vide
@@ -74,5 +83,12 @@ export class AuthService {
     const date = localStorage.getItem('dateConnexion');
     const heure = localStorage.getItem('heureConnexion');
     return date && heure ? `${date} à ${heure}` : null;
+  }
+
+  public identifierAuWebSocket() {
+    this.webSocketService.emit('identification', {
+      userId: this.currentUserId(),
+      pseudo: this.currentUser(),
+    });
   }
 }
