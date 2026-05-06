@@ -294,9 +294,9 @@ io.on('connection', (socket) => {
     socket.on('identification', (data) => {
         utilisateursConnectes.set(data.userId, { pseudo: data.pseudo, socketId: socket.id });
         // On broadcast la nouvelle liste à tout le monde
-        io.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
+        socket.broadcast.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
         // Notif pour tout le monde
-        io.emit('connexionNotif', { pseudo: data.pseudo, type: 'connexion' });
+        socket.broadcast.emit('connexionNotif', { pseudo: data.pseudo, type: 'connexion' });
     });
 
     // Réception d'un like depuis un client
@@ -328,13 +328,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('partage', (data) => {
-        io.emit('partage', { pseudo: data.pseudo });
+        socket.broadcast.emit('partage', { pseudo: data.pseudo });
     });
 
     socket.on('deconnexion', (data) => {
         utilisateursConnectes.delete(data.userId);
-        io.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
-        io.emit('connexionNotif', { pseudo: data.pseudo, type: 'deconnexion' });
+        socket.broadcast.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
+        socket.broadcast.emit('connexionNotif', { pseudo: data.pseudo, type: 'deconnexion' });
     });
 
     socket.on('disconnect', () => {

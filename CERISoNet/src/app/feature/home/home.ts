@@ -37,6 +37,7 @@ export class Home implements OnInit {
     });
 
     this.webSocketService.listen('partage').subscribe((data) => {
+      if (!this.authService.isLoggedIn()) return;
       this.bandeauInfoService.notifier(`${data.pseudo} a partagé un post !`, 'success');
     });
   }

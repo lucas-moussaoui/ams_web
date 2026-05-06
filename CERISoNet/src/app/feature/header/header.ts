@@ -24,6 +24,8 @@ export class Header implements OnInit {
     });
 
     this.webSocketService.listen('connexionNotif').subscribe((data) => {
+      console.log('isLoggedIn:', this.authService.isLoggedIn());
+      if (!this.authService.isLoggedIn()) return;
       if (data.type === 'connexion') {
         this.bandeauInfoService.notifier(`${data.pseudo} vient de se connecter`, 'success');
       } else {
