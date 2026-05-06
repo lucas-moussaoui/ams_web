@@ -100,7 +100,12 @@ export class PostsService {
   partager(postId: string, body: string, imageUrl: string, imageTitle: string) {
     return this.http.post<any>(
       `${this.API_URL}/share`,
-      { postId, body, image: { url: imageUrl, title: imageTitle } },
+      {
+        postId,
+        body,
+        hashtags: this.extraireHashtags(body),
+        image: { url: imageUrl, title: imageTitle },
+      },
       { withCredentials: true },
     );
   }
