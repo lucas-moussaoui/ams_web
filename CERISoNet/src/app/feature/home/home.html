@@ -113,9 +113,30 @@
         @if (post.hashtags && post.hashtags.length > 0) {
           <div class="flex flex-wrap gap-2 mt-3">
             @for (tag of post.hashtags; track $index) {
-              <span class="text-amber-700 font-medium text-sm">
-                {{ tag }}
-              </span>
+              <span class="text-amber-700 font-medium text-sm">{{ tag }}</span>
+            }
+          </div>
+        }
+
+        <!-- Post original si c'est un partage -->
+        @if (post.shared && post.postOriginal) {
+          <div class="mt-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
+            <p class="text-xs text-gray-400 mb-1">
+              Post original de Utilisateur #{{ post.postOriginal.createdBy }} — {{ post.postOriginal.date }} à {{ post.postOriginal.hour }}
+            </p>
+            <p class="text-sm text-gray-700">{{ post.postOriginal.body }}</p>
+
+            @if (post.postOriginal.images?.url || post.postOriginal.image?.url) {
+              <img [src]="post.postOriginal.images?.url || post.postOriginal.image?.url"
+                   class="w-full h-auto max-h-[300px] object-contain mt-2 rounded">
+            }
+
+            @if (post.postOriginal.hashtags && post.postOriginal.hashtags.length > 0) {
+              <div class="flex flex-wrap gap-2 mt-2">
+                @for (tag of post.postOriginal.hashtags; track $index) {
+                  <span class="text-amber-700 font-medium text-xs">{{ tag }}</span>
+                }
+              </div>
             }
           </div>
         }
@@ -127,7 +148,7 @@
           <mat-icon>{{ post.likedBy?.includes(authService.currentUserId()) ? 'favorite' : 'favorite_border' }}</mat-icon>
           <span class="text-sm font-medium">{{ post.likes || 0 }}</span>
         </button>
-        <button class="flex items-center gap-1.5 text-gray-600 px-2 py-1 rounded-md">
+        <button (click)="ouvrirPartage(post)" class="flex items-center gap-1.5 text-gray-600 px-2 py-1 rounded-md">
           <mat-icon>share</mat-icon>
           <span class="text-sm font-medium">Partager</span>
         </button>

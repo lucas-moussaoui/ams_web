@@ -148,7 +148,16 @@ app.get('/posts', async (req, res) => {
             .skip(skip)
             .limit(limit)
             .toArray(); // renvoi la liste des postes
-        res.json(posts);
+        // Pour chaque post partagé, on récupère le post original
+        const postsAvecOriginal = await Promise.all(posts.map(async (post) => {
+            if (post.shared) {
+                const postOriginal = await collection.findOne({ _id: post.shared });
+                return { ...post, postOriginal };
+            }
+            return post;
+        }));
+
+        res.json(postsAvecOriginal);
     } catch (err) {
         res.status(500).send("Erreur lors de la récupération des posts");
     }
@@ -223,6 +232,45 @@ app.post('/comment', async (req, res) => {
     }
 });
 
+app.post('/share', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: "Vous devez être connecté" });
+    }
+
+    try {
+        const db = clientMongo.db('db-CERI');
+        const collection = db.collection('CERISoNet');
+        const { ObjectId } = require('mongodb');
+
+        const maintenant = new Date();
+
+        // Extraction des hashtags du message
+        const hashtagRegex = /#(\w+)/g;
+        const hashtags = req.body.body.match(hashtagRegex) || [];
+
+        const nouveauPost = {
+            date: maintenant.toLocaleDateString('sv-SE'),
+            hour: maintenant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+            body: req.body.body,
+            createdBy: req.session.user.id,
+            images: req.body.image?.url ? { url: req.body.image.url, title: req.body.image.title } : null,
+            likes: 0,
+            hashtags: hashtags,
+            comments: [],
+            shared: new ObjectId(req.body.postId)
+        };
+
+        const result = await collection.insertOne(nouveauPost);
+
+        if (result.acknowledged) {
+            res.json({ success: true, postId: result.insertedId });
+        }
+    } catch (err) {
+        console.error("Erreur partage:", err);
+        res.status(500).json({ message: "Erreur lors du partage" });
+    }
+});
+
 // Lancement du serveur en HTTPS avec les certificats SSL
 const options = {
     key: fs.readFileSync('key.pem'),
@@ -277,6 +325,10 @@ io.on('connection', (socket) => {
                 console.error("Les likes sont encore corrompu super !", err.message);
             }
         }
+    });
+
+    socket.on('partage', (data) => {
+        io.emit('partage', { pseudo: data.pseudo });
     });
 
     socket.on('deconnexion', (data) => {

@@ -1,4 +1,4 @@
-import { HostListener, inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -94,6 +94,14 @@ export class PostsService {
         }
         return p;
       }),
+    );
+  }
+
+  partager(postId: string, body: string, imageUrl: string, imageTitle: string) {
+    return this.http.post<any>(
+      `${this.API_URL}/share`,
+      { postId, body, image: { url: imageUrl, title: imageTitle } },
+      { withCredentials: true },
     );
   }
 }

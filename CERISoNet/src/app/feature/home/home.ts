@@ -9,6 +9,7 @@ import { CreatePost } from '../create-post/create-post';
 import { BandeauInfoService } from '../../service/bandeau-info.service';
 import { AuthService } from '../../service/auth.service';
 import { WebSocketService } from '../../service/websocket.service';
+import { SharePost } from '../share-post/share-post';
 
 @Component({
   selector: 'app-home',
@@ -33,6 +34,10 @@ export class Home implements OnInit {
     // Ecoute les likes en temps réel
     this.webSocketService.listen('like').subscribe((data) => {
       this.postsService.ajouterLikeLocalement(data.postId, data.userId);
+    });
+
+    this.webSocketService.listen('partage').subscribe((data) => {
+      this.bandeauInfoService.notifier(`${data.pseudo} a partagé un post !`, 'success');
     });
   }
 
@@ -152,6 +157,21 @@ export class Home implements OnInit {
       postId,
       pseudo: this.authService.currentUser(),
       userId: this.authService.currentUserId(),
+    });
+  }
+
+  ouvrirPartage(post: any) {
+    const dialogRef = this.dialog.open(SharePost, {
+      width: '500px',
+      data: post, // On passe le post original
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.bandeauInfoService.notifier('Post partagé !', 'success');
+        this.postsService.viderPosts();
+        this.chargerPosts();
+      }
     });
   }
 }
