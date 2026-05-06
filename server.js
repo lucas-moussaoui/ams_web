@@ -298,8 +298,8 @@ io.on('connection', (socket) => {
     socket.on('identification', (data) => {
         utilisateursConnectes.set(data.userId, { pseudo: data.pseudo, socketId: socket.id });
         // On broadcast la nouvelle liste à tout le monde pour afficher le nombre de personne connecté
-        socket.broadcast.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
-        // Notif pour tout le monde
+        io.emit('utilisateursConnectes', Array.from(utilisateursConnectes.values()).map(u => u.pseudo));
+        // Notif pour tout le monde ( sauf soi )
         socket.broadcast.emit('connexionNotif', { pseudo: data.pseudo, type: 'connexion' });
     });
 
