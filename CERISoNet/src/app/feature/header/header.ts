@@ -19,12 +19,14 @@ export class Header implements OnInit {
   protected afficherPopup = signal<boolean>(false);
 
   ngOnInit() {
-    this.webSocketService.listen('utilisateursConnectes').subscribe((pseudos: string[]) => {
+
+    // on écoute le web socket pour récupérer la nouvelle liste des user connecté
+    this.webSocketService.listen('utilisateursConnectes').subscribe((pseudos) => {
       this.connectes.set(pseudos);
     });
 
+    // on écoute également un web socket pour afficher la notif de connexion et deconnexion
     this.webSocketService.listen('connexionNotif').subscribe((data) => {
-      console.log('isLoggedIn:', this.authService.isLoggedIn());
       if (!this.authService.isLoggedIn()) return;
       if (data.type === 'connexion') {
         this.bandeauInfoService.notifier(`${data.pseudo} vient de se connecter`, 'success');
@@ -34,6 +36,7 @@ export class Header implements OnInit {
     });
   }
   togglePopup() {
+    // popup pour les user connecté
     this.afficherPopup.update((v) => !v);
   }
 }

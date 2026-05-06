@@ -28,28 +28,31 @@ export class Home implements OnInit {
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      this.chargerPosts();
+      this.chargerPosts(); // chargement des post a l'init si connecté
     }
 
     // Ecoute les likes en temps réel
     this.webSocketService.listen('like').subscribe((data) => {
-      this.postsService.ajouterLikeLocalement(data.postId, data.userId);
+      this.postsService.ajouterLikeLocalement(data.postId, data.userId); // ajoute localement
     });
 
+    // Ecoute les partage d'autre user pour recevoir la notif
     this.webSocketService.listen('partage').subscribe((data) => {
       if (!this.authService.isLoggedIn()) return;
       this.bandeauInfoService.notifier(`${data.pseudo} a partagé un post !`, 'success');
     });
   }
 
+  // ecoute l'événement scroll de la fenêtre
   @HostListener('window:scroll', [])
   onWindowScroll() {
     if (this.loading) return;
 
+    // scrollTop = pixels déjà scrollés + offsetHeight = hauteur visible de la fenêtre
     const pos =
       (document.documentElement.scrollTop || document.body.scrollTop) +
       document.documentElement.offsetHeight;
-    const max = document.documentElement.scrollHeight;
+    const max = document.documentElement.scrollHeight; // hauteur totale de la page
 
     if (pos > max - 200) {
       // Grace au calcul de la position c'est uniquement lors d'un scroll assez descendant que la fonction charger sera appelé
@@ -82,8 +85,7 @@ export class Home implements OnInit {
         // Après avoir été fermé on notifie l'utilisateur et on refresh les données de la page
 
         this.bandeauInfoService.notifier(`Publication crée !`, 'success');
-        this.postsService.viderPosts();
-        this.chargerPosts();
+        this.refresh();
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -91,11 +93,11 @@ export class Home implements OnInit {
   }
 
   commenter(postId: string, texte: string) {
-    if (!texte.trim()) return;
+    if (!texte.trim()) return; // on vérifie que ce n'est pas que du blanc
 
     this.postsService.commenter(postId, texte).subscribe({
       next: (res) => {
-        this.postsService.ajouterCommentaireLocalement(postId, res.comment);
+        this.postsService.ajouterCommentaireLocalement(postId, res.comment); // ajout local pour qu'on le voit directement
         this.bandeauInfoService.notifier('Commentaire posté !', 'success');
       },
       error: () => {
@@ -106,20 +108,17 @@ export class Home implements OnInit {
 
   trierPosts(tri: string) {
     this.postsService.triActif.set(tri);
-    this.postsService.viderPosts();
-    this.chargerPosts();
+    this.refresh();
   }
 
   changerOrdre() {
     this.postsService.ordreActif.update((ordre) => (ordre === -1 ? 1 : -1));
-    this.postsService.viderPosts();
-    this.chargerPosts();
+    this.refresh();
   }
 
   filtrerPosts(filtre: string) {
     this.postsService.filtreActif.set(filtre);
-    this.postsService.viderPosts();
-    this.chargerPosts();
+    this.refresh();
   }
 
   protected afficherRechercheHashtag = signal<boolean>(false);
@@ -129,8 +128,7 @@ export class Home implements OnInit {
     if (!this.afficherRechercheHashtag()) {
       // Si on ferme, on reset le filtre hashtag
       this.postsService.hashtagsActifs.set([]);
-      this.postsService.viderPosts();
-      this.chargerPosts();
+      this.refresh();
     }
   }
 
@@ -139,21 +137,17 @@ export class Home implements OnInit {
     const tag = hashtag.startsWith('#') ? hashtag : '#' + hashtag;
     if (!this.postsService.hashtagsActifs().includes(tag)) {
       this.postsService.hashtagsActifs.update((tags) => [...tags, tag]);
-      this.appliquerHashtags();
+      this.refresh();
     }
   }
 
   supprimerHashtag(hashtag: string) {
     this.postsService.hashtagsActifs.update((tags) => tags.filter((t) => t !== hashtag));
-    this.appliquerHashtags();
-  }
-
-  appliquerHashtags() {
-    this.postsService.viderPosts();
-    this.chargerPosts();
+    this.refresh();
   }
 
   liker(postId: string) {
+    // on émit au websocket que on a like un post précis
     this.webSocketService.emit('like', {
       postId,
       pseudo: this.authService.currentUser(),
@@ -170,9 +164,13 @@ export class Home implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.bandeauInfoService.notifier('Post partagé !', 'success');
-        this.postsService.viderPosts();
-        this.chargerPosts();
+        this.refresh();
       }
     });
+  }
+
+  public refresh(){
+    this.postsService.viderPosts();
+    this.chargerPosts();
   }
 }

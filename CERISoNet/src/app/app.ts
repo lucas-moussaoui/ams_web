@@ -16,7 +16,7 @@ export class App implements OnInit {
   private authService = inject(AuthService);
 
   ngOnInit() {
-    // Cette ligne s'exécute quelle que soit l'URL saisie par l'utilisateur
+    // cette ligne s'execute quoi qu'il arrive
     this.authService.checkStatus();
   }
 }

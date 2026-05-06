@@ -45,15 +45,15 @@ export class AuthLogin {
 
               // Mise à jour de l'état global
               this.authService.isLoggedIn.set(true);
-              this.authService.currentUser.set(res.user);
-              this.authService.currentUserId.set(parseInt(res.id));
+              this.authService.currentUser.set(res.user); // garde le pseudo
+              this.authService.currentUserId.set(parseInt(res.id)); // conserve l'id pour savoir qui a like
 
               // Sauvegarde locale de la date et l'heure
               localStorage.setItem('dateConnexion', maintenant.toLocaleDateString());
               localStorage.setItem('heureConnexion', maintenant.toLocaleTimeString());
 
               this.bandeauInfoService.notifier(`Connexion réussie !`, 'success');
-              this.postsService.initialiserPosts(); // Permer d'initialiser es posts lors de la connexion
+              this.postsService.initialiserPosts(); // Permer d'initialiser les posts lors de la connexion
               this.authService.identifierAuWebSocket();
               this.dialogRef.close(true); // Fermeture de la modale
             }
