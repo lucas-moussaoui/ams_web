@@ -46,6 +46,7 @@ export class AuthLogin {
               // Mise à jour de l'état global
               this.authService.isLoggedIn.set(true);
               this.authService.currentUser.set(res.user);
+              this.authService.currentUserId.set(parseInt(res.id));
 
               // Sauvegarde locale de la date et l'heure
               localStorage.setItem('dateConnexion', maintenant.toLocaleDateString());

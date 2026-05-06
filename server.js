@@ -73,7 +73,7 @@ app.post('/login', (request, response) => {
                     request.session.isConnected = true;
                     request.session.user = { id: user.id, pseudo: user.pseudo, mail: user.mail };
                     client.release();
-                    response.json({ success: true, user: user.pseudo });
+                    response.json({ success: true, user: user.pseudo, id: user.id });
                 } else {
                     client.release();
                     response.status(401).json({ success: false, message: "Identifiants incorrects" });
@@ -111,7 +111,7 @@ app.post('/logout', (req, res) => {
 // Route pour savoir si l'utilisateur est toujours connecté au rafraîchissement de la page
 app.get('/check-session', (req, res) => {
     if (req.session && req.session.user) {
-        res.json({ authenticated: true, user: req.session.user.pseudo });
+        res.json({ authenticated: true, user: req.session.user.pseudo, id: req.session.user.id });
     } else {
         res.status(401).json({ authenticated: false });
     }
@@ -228,6 +228,53 @@ const options = {
     cert: fs.readFileSync('cert.pem')
 };
 
-https.createServer(options, app).listen(port, () => {
+const server = https.createServer(options, app);
+
+// Setup Socket.io sur le serveur HTTPS
+const io = require('socket.io')(server, {
+    cors: {
+        origin: 'https://pedago.univ-avignon.fr:3114',
+        credentials: true
+    }
+});
+
+// Gestion des WebSockets
+io.on('connection', (socket) => {
+    console.log('Un client WebSocket connecté');
+
+    // Réception d'un like depuis un client
+    socket.on('like', async (data) => {
+        const { ObjectId } = require('mongodb');
+        const db = clientMongo.db('db-CERI');
+        const collection = db.collection('CERISoNet');
+
+        const userId = parseInt(data.userId);
+
+        const post = await collection.findOne({ _id: new ObjectId(data.postId) });
+
+        const dejaLike = post.likedBy && post.likedBy.includes(userId);
+
+        if (!dejaLike) {
+            try {
+                await collection.updateOne(
+                    {_id: new ObjectId(data.postId)},
+                    {
+                        $inc: {likes: 1},
+                        $push: {likedBy: userId}
+                    }
+                );
+                io.emit('like', {postId: data.postId, pseudo: data.pseudo, userId: userId});
+            } catch (err) {
+                console.error("Les likes sont encore corrompu super !", err.message);
+            }
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Un client WebSocket déconnecté');
+    });
+});
+
+server.listen(port, () => {
     console.log("Serveur Node sécurisé lancé sur le port : " + port);
-})
+});

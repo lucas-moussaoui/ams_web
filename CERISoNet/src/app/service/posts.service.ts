@@ -81,4 +81,19 @@ export class PostsService {
       ),
     );
   }
+
+  ajouterLikeLocalement(postId: string, userId: number) {
+    this.posts.update((posts) =>
+      posts.map((p) => {
+        if (p._id.toString() === postId) {
+          return {
+            ...p,
+            likes: (p.likes || 0) + 1,
+            likedBy: [...(p.likedBy || []), parseInt(userId.toString())],
+          };
+        }
+        return p;
+      }),
+    );
+  }
 }

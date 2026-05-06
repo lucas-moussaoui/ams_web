@@ -10,13 +10,14 @@ import { PostsService } from './posts.service';
 export class AuthService {
   private diaolg = inject(MatDialog);
   private http = inject(HttpClient);
-  private postsService = inject(PostsService)
+  private postsService = inject(PostsService);
 
   API_URL = 'https://pedago.univ-avignon.fr:3115';
 
   // Signaux pour suivre l'état de l'utilisateur partout dans l'appli
   isLoggedIn = signal<boolean>(false);
   currentUser = signal<string | null>(null);
+  currentUserId = signal<number | null>(null);
 
   // Ouvre la fenêtre de connexion (la modale)
   public openLoginDialog() {
@@ -56,6 +57,7 @@ export class AuthService {
         // Si le serveur répond OK, on reconnecte l'utilisateur
         this.isLoggedIn.set(true);
         this.currentUser.set(res.user);
+        this.currentUserId.set(parseInt(res.id));
         this.postsService.initialiserPosts();
       },
       error: () => {

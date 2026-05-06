@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreatePost } from '../create-post/create-post';
 import { BandeauInfoService } from '../../service/bandeau-info.service';
 import { AuthService } from '../../service/auth.service';
+import { WebSocketService } from '../../service/websocket.service';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +20,8 @@ export class Home implements OnInit {
   private dialog = inject(MatDialog);
   protected postsService = inject(PostsService);
   private bandeauInfoService = inject(BandeauInfoService);
-  private authService = inject(AuthService);
+  protected authService = inject(AuthService);
+  private webSocketService = inject(WebSocketService);
 
   protected loading = false;
 
@@ -27,6 +29,11 @@ export class Home implements OnInit {
     if (this.authService.isLoggedIn()) {
       this.chargerPosts();
     }
+
+    // Ecoute les likes en temps réel
+    this.webSocketService.listen('like').subscribe((data) => {
+      this.postsService.ajouterLikeLocalement(data.postId, data.userId);
+    });
   }
 
   @HostListener('window:scroll', [])
@@ -138,5 +145,13 @@ export class Home implements OnInit {
   appliquerHashtags() {
     this.postsService.viderPosts();
     this.chargerPosts();
+  }
+
+  liker(postId: string) {
+    this.webSocketService.emit('like', {
+      postId,
+      pseudo: this.authService.currentUser(),
+      userId: this.authService.currentUserId(),
+    });
   }
 }

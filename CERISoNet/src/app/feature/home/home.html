@@ -122,8 +122,9 @@
       </div>
 
       <div class="px-4 py-2 border-t border-gray-50 flex items-center gap-4">
-        <button>
-          <mat-icon>favorite_border</mat-icon>
+        <button (click)="liker(post._id)"
+                [disabled]="post.likedBy?.includes(authService.currentUserId())">
+          <mat-icon>{{ post.likedBy?.includes(authService.currentUserId()) ? 'favorite' : 'favorite_border' }}</mat-icon>
           <span class="text-sm font-medium">{{ post.likes || 0 }}</span>
         </button>
         <button class="flex items-center gap-1.5 text-gray-600 px-2 py-1 rounded-md">
