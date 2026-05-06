@@ -1,0 +1,43 @@
+<div class="p-6 flex flex-col gap-4 w-full">
+  <h2 class="text-lg font-bold text-gray-800">Partager ce post</h2>
+
+  <!-- Aperçu du post original -->
+  <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+    <p class="text-xs text-gray-400 mb-1">Post de Utilisateur #{{ postOriginal.createdBy }}</p>
+    <p class="text-sm text-gray-700">{{ postOriginal.body }}</p>
+  </div>
+
+  <!-- Formulaire -->
+  <form [formGroup]="shareForm" (ngSubmit)="onPartager()" class="flex flex-col gap-3">
+    <textarea formControlName="body"
+              placeholder="Votre message..."
+              rows="3"
+              class="border border-gray-200 rounded-lg p-3 text-sm resize-none">
+    </textarea>
+
+    <input formControlName="imageUrl" type="text"
+           placeholder="URL de l'image (optionnel)"
+           class="border border-gray-200 rounded-lg p-3 text-sm">
+
+    <input formControlName="imageTitle" type="text"
+           placeholder="Titre de l'image (optionnel)"
+           class="border border-gray-200 rounded-lg p-3 text-sm">
+
+    <!-- Aperçu post original -->
+    <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+      <p class="text-xs text-gray-400 mb-1">Post de Utilisateur #{{ postOriginal.createdBy }}</p>
+      <p class="text-sm text-gray-700">{{ postOriginal.body }}</p>
+    </div>
+
+    <div class="flex gap-2 justify-end">
+      <button type="button" (click)="dialogRef.close()"
+              class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm">
+        Annuler
+      </button>
+      <button type="submit"
+              class="px-4 py-2 rounded-lg bg-amber-700 text-white text-sm">
+        Partager
+      </button>
+    </div>
+  </form>
+</div>
