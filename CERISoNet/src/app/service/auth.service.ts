@@ -33,6 +33,7 @@ export class AuthService {
   // Gère la sortie de l'utilisateur
   public deconnexion() {
 
+    // on émit pour se déconnecter et s'enlever de la liste
     this.webSocketService.emit('deconnexion', {
       userId: this.currentUserId(),
       pseudo: this.currentUser(),

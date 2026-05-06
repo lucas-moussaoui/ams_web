@@ -10,20 +10,21 @@ export class PostsService {
   private API_URL = 'https://pedago.univ-avignon.fr:3115';
 
   public posts = signal<any[]>([]); // Liste des Posts récupérer depuis la BDD
-  public skip = 0; // Permet de ne charger que les nouveaux posts en skkippant les ancien
+  public skip = 0; // Permet de ne charger que les nouveaux posts en skippant les ancien
   public limit = 10; // Limite de nouveau posts a charger a chaque requète
 
-  public triActif = signal<string>('date');
+  public triActif = signal<string>('date'); // date, proprietaire ou popularite
   public ordreActif = signal<number>(-1); // -1 = décroissant, 1 = croissant
 
   public filtreActif = signal<string>('tous'); // 'tous' ou 'moi'
-  public hashtagsActifs = signal<string[]>([]);
+  public hashtagsActifs = signal<string[]>([]); // hashtags filtrés
 
   getPosts(skip: number, limit: number) {
     const hashtags = this.hashtagsActifs();
-    const hashtagParam = hashtags.length > 0
-      ? '&hashtags=' + hashtags.map((h) => encodeURIComponent(h)).join('|')
-        : '';
+    const hashtagParam =
+      hashtags.length > 0
+        ? '&hashtags=' + hashtags.map((h) => encodeURIComponent(h)).join('|')
+        : ''; // Encodage les hashtags pour l'URL et sépare par |
     const url = `${this.API_URL}/posts?skip=${skip}&limit=${limit}&tri=${this.triActif()}&ordre=${this.ordreActif()}&filtre=${this.filtreActif()}${hashtagParam}`;
     return this.http.get<any[]>(url, { withCredentials: true });
   }
@@ -51,7 +52,7 @@ export class PostsService {
   }
 
   public initialiserPosts() {
-    // Cette fonction est similaire a la fonction CHargerPosts dans home.ts
+    // Cette fonction est similaire a la fonction ChargerPosts dans home.ts
     // mais celle ci permet d'initialiser les premiers posts lors de la connexion
     this.viderPosts();
 
@@ -77,7 +78,7 @@ export class PostsService {
   ajouterCommentaireLocalement(postId: string, commentaire: any) {
     this.posts.update((posts) =>
       posts.map((p) =>
-        p._id === postId ? { ...p, comments: [...(p.comments || []), commentaire] } : p,
+        p._id.toString() === postId ? { ...p, comments: [...(p.comments || []), commentaire] } : p,
       ),
     );
   }
@@ -89,7 +90,7 @@ export class PostsService {
           return {
             ...p,
             likes: (p.likes || 0) + 1,
-            likedBy: [...(p.likedBy || []), parseInt(userId.toString())],
+            likedBy: [...(p.likedBy || []), userId],
           };
         }
         return p;

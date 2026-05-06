@@ -6,11 +6,12 @@ import { io } from 'socket.io-client';
   providedIn: 'root',
 })
 export class WebSocketService {
+  // on se connecte au server web socket
   private socket = io('https://pedago.univ-avignon.fr:3115', {
     withCredentials: true,
   });
 
-  // Ecoute un evenement venant du serveur
+  // retourne un observable qui emet a chaque reception de message
   listen(eventName: string): Observable<any> {
     return new Observable((subscriber) => {
       this.socket.on(eventName, (data) => {

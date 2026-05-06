@@ -18,7 +18,6 @@ export class BandeauInfoService {
         dismissible: true,
       },
       {
-        // Pas utilisé pour le moments, mais le moment viendra un jour
         type: 'error',
         background: '#ef4444', // Couleur rouge
         dismissible: true,
