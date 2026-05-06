@@ -16,11 +16,16 @@ export class PostsService {
   public triActif = signal<string>('date');
   public ordreActif = signal<number>(-1); // -1 = décroissant, 1 = croissant
 
+  public filtreActif = signal<string>('tous'); // 'tous' ou 'moi'
+  public hashtagsActifs = signal<string[]>([]);
+
   getPosts(skip: number, limit: number) {
-    return this.http.get<any[]>(
-      `${this.API_URL}/posts?skip=${skip}&limit=${limit}&tri=${this.triActif()}&ordre=${this.ordreActif()}`,
-      { withCredentials: true },
-    );
+    const hashtags = this.hashtagsActifs();
+    const hashtagParam = hashtags.length > 0
+      ? '&hashtags=' + hashtags.map((h) => encodeURIComponent(h)).join('|')
+        : '';
+    const url = `${this.API_URL}/posts?skip=${skip}&limit=${limit}&tri=${this.triActif()}&ordre=${this.ordreActif()}&filtre=${this.filtreActif()}${hashtagParam}`;
+    return this.http.get<any[]>(url, { withCredentials: true });
   }
 
   publier(message: string, urlImage: string, titreImage: string) {

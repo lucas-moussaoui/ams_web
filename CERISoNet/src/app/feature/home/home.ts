@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -99,6 +99,43 @@ export class Home implements OnInit {
 
   changerOrdre() {
     this.postsService.ordreActif.update((ordre) => (ordre === -1 ? 1 : -1));
+    this.postsService.viderPosts();
+    this.chargerPosts();
+  }
+
+  filtrerPosts(filtre: string) {
+    this.postsService.filtreActif.set(filtre);
+    this.postsService.viderPosts();
+    this.chargerPosts();
+  }
+
+  protected afficherRechercheHashtag = signal<boolean>(false);
+
+  toggleRechercheHashtag() {
+    this.afficherRechercheHashtag.update((v) => !v);
+    if (!this.afficherRechercheHashtag()) {
+      // Si on ferme, on reset le filtre hashtag
+      this.postsService.hashtagsActifs.set([]);
+      this.postsService.viderPosts();
+      this.chargerPosts();
+    }
+  }
+
+  ajouterHashtag(hashtag: string) {
+    if (!hashtag.trim()) return;
+    const tag = hashtag.startsWith('#') ? hashtag : '#' + hashtag;
+    if (!this.postsService.hashtagsActifs().includes(tag)) {
+      this.postsService.hashtagsActifs.update((tags) => [...tags, tag]);
+      this.appliquerHashtags();
+    }
+  }
+
+  supprimerHashtag(hashtag: string) {
+    this.postsService.hashtagsActifs.update((tags) => tags.filter((t) => t !== hashtag));
+    this.appliquerHashtags();
+  }
+
+  appliquerHashtags() {
     this.postsService.viderPosts();
     this.chargerPosts();
   }

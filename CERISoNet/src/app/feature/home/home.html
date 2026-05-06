@@ -1,30 +1,91 @@
 <div class="max-w-2xl mx-auto p-4 flex flex-col gap-6">
+  <div class="max-w-2xl mx-auto p-4">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex flex-col gap-3">
 
-  <div class="max-w-2xl mx-auto p-4 flex gap-2">
-    <button (click)="trierPosts('date')"
-            [class.bg-amber-700]="postsService.triActif() === 'date'"
-            [class.text-white]="postsService.triActif() === 'date'"
-            class="p-3 rounded-full text-sm border border-amber-700 text-amber-700">
-      Date
-    </button>
-    <button (click)="trierPosts('proprietaire')"
-            [class.bg-amber-700]="postsService.triActif() === 'proprietaire'"
-            [class.text-white]="postsService.triActif() === 'proprietaire'"
-            class="p-3 rounded-full text-sm border border-amber-700 text-amber-700">
-      Propriétaire
-    </button>
-    <button (click)="trierPosts('popularite')"
-            [class.bg-amber-700]="postsService.triActif() === 'popularite'"
-            [class.text-white]="postsService.triActif() === 'popularite'"
-            class="p-3 rounded-full text-sm border border-amber-700 text-amber-700">
-      Popularité
-    </button>
+      <!-- Tris -->
+      <div>
+        <p class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Trier par</p>
+        <div class="flex gap-2 flex-wrap">
+          <button (click)="trierPosts('date')"
+                  [class.bg-amber-700]="postsService.triActif() === 'date'"
+                  [class.text-white]="postsService.triActif() === 'date'"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Date
+          </button>
+          <button (click)="trierPosts('proprietaire')"
+                  [class.bg-amber-700]="postsService.triActif() === 'proprietaire'"
+                  [class.text-white]="postsService.triActif() === 'proprietaire'"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Propriétaire
+          </button>
+          <button (click)="trierPosts('popularite')"
+                  [class.bg-amber-700]="postsService.triActif() === 'popularite'"
+                  [class.text-white]="postsService.triActif() === 'popularite'"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Popularité
+          </button>
+          <button (click)="changerOrdre()"
+                  class="p-3 rounded-lg border border-amber-700 text-amber-700">
+            <mat-icon>{{ postsService.ordreActif() === -1 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100"></div>
+
+      <!-- Filtres -->
+      <div>
+        <p class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide">Filtrer</p>
+        <div class="flex gap-2 flex-wrap">
+          <button (click)="filtrerPosts('tous')"
+                  [class.bg-amber-700]="postsService.filtreActif() === 'tous'"
+                  [class.text-white]="postsService.filtreActif() === 'tous'"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Tous
+          </button>
+          <button (click)="filtrerPosts('moi')"
+                  [class.bg-amber-700]="postsService.filtreActif() === 'moi'"
+                  [class.text-white]="postsService.filtreActif() === 'moi'"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Mes posts
+          </button>
+          <button (click)="toggleRechercheHashtag()"
+                  [class.bg-amber-700]="afficherRechercheHashtag()"
+                  [class.text-white]="afficherRechercheHashtag()"
+                  class="flex-1 p-2 rounded-lg text-sm border border-amber-700 text-amber-700">
+            Hashtag
+          </button>
+        </div>
+      </div>
+
+      <!-- Recherche hashtag -->
+      @if (afficherRechercheHashtag()) {
+        <div class="border-t border-gray-100 pt-3 flex flex-col gap-2">
+          <div class="flex gap-2">
+            <input #hashtagInput
+                   type="text"
+                   placeholder="Ajouter un hashtag..."
+                   class="flex-1 border border-gray-200 rounded-lg p-3 text-sm">
+            <button (click)="ajouterHashtag(hashtagInput.value); hashtagInput.value = ''"
+                    class="p-4 rounded-lg bg-amber-700 text-white text-sm">
+              Ajouter
+            </button>
+          </div>
+
+          @if (postsService.hashtagsActifs().length > 0) {
+            <div class="flex flex-wrap gap-2">
+              @for (tag of postsService.hashtagsActifs(); track tag) {
+                <span class="flex items-center gap-1 bg-amber-700 text-white p-3 rounded-full text-sm">
+                {{ tag }}
+                  <mat-icon (click)="supprimerHashtag(tag)">close</mat-icon>
+              </span>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
-
-  <button (click)="changerOrdre()" class="p-1 rounded-full text-sm border border-amber-700 text-amber-700">
-    <mat-icon>{{ postsService.ordreActif() === -1 ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-  </button>
-
   @for (post of postsService.posts(); track post._id) {
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
